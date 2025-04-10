@@ -51,26 +51,28 @@ SELECT
   strftime(strptime(CAST("{job_stats_createTime}" AS VARCHAR), '%Y-%m-%d %H:%M:%S.%f'), '%A') AS day_of_week,
   CAST(strftime(strptime(CAST("{job_stats_createTime}" AS VARCHAR), '%Y-%m-%d %H:%M:%S.%f'), '%H') AS INT) AS hour
 
-FROM read_csv_auto('bq-logs-aman.csv')
+FROM read_csv_auto('converted.csv')
 WHERE "{query_text}" IS NOT NULL
 """
 
 # Replace placeholders with actual column names
 colmap = {
-    "user_email": "protopayload_auditlog__authenticationInfo__principalEmail",
-    "project_id": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobName__projectId",
-    "region": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobName__location",
-    "job_id": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobName__jobId",
-    "query_text": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobConfiguration__query__query",
-    "job_status_state": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatus__state",
-    "job_status_error": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatus__error",
-    "job_stats_createTime": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatistics__createTime",
-    "job_stats_endTime": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatistics__endTime",
-    "bytes_processed": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatistics__totalProcessedBytes",
-    "bytes_billed": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatistics__totalBilledBytes",
-    "slot_ms": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatistics__totalSlotMs",
-    "output_rows": "protopayload_auditlog__servicedata_v1_bigquery__jobCompletedEvent__job__jobStatistics__queryOutputRowCount"
+    "user_email": "protopayload_auditlog.authenticationInfo.principalEmail",
+    "project_id": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobName.projectId",
+    "region": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobName.location",
+    "job_id": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobName.jobId",
+    "query_text": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobConfiguration.query.query",
+    "job_status_state": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatus.state",
+    "job_status_error": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatus.error",
+    "job_stats_createTime": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatistics.createTime",
+    "job_stats_endTime": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatistics.endTime",
+    "bytes_processed": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatistics.totalProcessedBytes",
+    "bytes_billed": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatistics.totalBilledBytes",
+    "slot_ms": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatistics.totalSlotMs",
+    "output_rows": "protopayload_auditlog.servicedata_v1_bigquery.jobCompletedEvent.job.jobStatistics.queryOutputRowCount"
 }
+
+
 
 # Replace placeholders in the query string
 for placeholder, actual in colmap.items():
@@ -80,5 +82,4 @@ for placeholder, actual in colmap.items():
 df = con.execute(query).fetchdf()
 print(df.head())
 
-df.to_csv("refined_bq_usage_utf8.csv", index=False, encoding="utf-8")
-
+df.to_csv("refined_converted.csv", index=False, encoding="utf-8")
